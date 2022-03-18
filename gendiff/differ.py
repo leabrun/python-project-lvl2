@@ -1,4 +1,5 @@
 import json
+import yaml
 
 
 def filter_values(all_values, dict):
@@ -11,8 +12,12 @@ def filter_values(all_values, dict):
 
 
 def open_file(first_path, second_path):
-    first_dict = json.load(open(first_path))
-    second_dict = json.load(open(second_path))
+    if first_path.endswith('.json') and second_path.endswith('.json'):
+        first_dict = json.load(open(first_path))
+        second_dict = json.load(open(second_path))
+    elif first_path.endswith('.yaml') and second_path.endswith('.yaml'):
+        first_dict = yaml.load(open(first_path), Loader=yaml.Loader)
+        second_dict = yaml.load(open(second_path), Loader=yaml.Loader)
     return first_dict, second_dict
 
 
