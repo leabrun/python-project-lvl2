@@ -17,5 +17,6 @@ def test_generate_diff():
     file_path2 = 'gendiff/tests/fixture/plain_yaml/file2.yaml'
     answer = generate_diff(file_path1, file_path2)
     assert answer == correct_answer
-  
+
+
 print(test_generate_diff())
