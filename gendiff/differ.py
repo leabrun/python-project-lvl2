@@ -21,6 +21,12 @@ def formater(diff_list, format):
         return stylish(diff_list)
     elif format == 'plain':
         return plain(diff_list)
+    elif format == 'json':
+        return to_json(diff_list)
+
+
+def to_json(diff_list):
+    return json.dumps(diff_list, indent=4)
 
 
 def plain(diff_list):
