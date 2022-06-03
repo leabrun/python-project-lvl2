@@ -2,17 +2,6 @@ import json
 import yaml
 
 
-def filter_values(all_values, dict):
-    values_copy = list(all_values.copy())
-
-    for value in all_values:
-        if value in dict:
-            values_copy.remove(value)
-            values_copy.insert(0, value)
-
-    return values_copy
-
-
 def open_file(file_path):
     if file_path.endswith('.yaml'):
         return yaml.load(open(file_path), Loader=yaml.Loader)
@@ -27,29 +16,86 @@ def open_files(first_path, second_path):
     return file1, file2
 
 
-def generate_diff(first_path, second_path):
-    first_dict, second_dict = open_files(first_path, second_path)
+def stylish(diff_list, level=0):
+    result = '{\n'
+    indent = '  '
 
-    identical = first_dict.items() & second_dict.items()
-    missed = first_dict.items() - second_dict.items()
-    extra = second_dict.items() - first_dict.items()
+    for i in range(level):
+        indent += '    '
 
-    all_values = identical | missed | extra
-    all_values = filter_values(all_values, first_dict)
+    diff_list.sort(key=lambda x: x['name'])
 
-    sorted_pairs = sorted(
-        all_values, key=lambda pair: pair[0].lower()
-    )
+    for node in diff_list:
+        if node['status'] == 'nested':
+            data = stylish(node['children'], level + 1)
+            result += f"{indent}  {node['name']}: {data}\n"
+        if node['status'] == 'not changed':
+            data = format_data(node['data'], indent)
+            result += f"{indent}  {node['name']}: {data}\n"
+        if node['status'] == 'added':
+            data = format_data(node['data'], indent)
+            result += f"{indent}+ {node['name']}: {data}\n"
+        if node['status'] == 'deleted':
+            data = format_data(node['data'], indent)
+            result += f"{indent}- {node['name']}: {data}\n"
+        if node['status'] == 'changed':
+            data = format_data(node['data before'], indent)
+            result += f"{indent}- {node['name']}: {data}\n"
+            data = format_data(node['data after'], indent)
+            result += f"{indent}+ {node['name']}: {data}\n"
+    result += indent[:-2] + '}'
 
-    diff = []
-    for k, v in sorted_pairs:
-        if (k, v) in missed:
-            diff.append(('- ' + k, v))
-        elif (k, v) in extra:
-            diff.append(('+ ' + k, v))
+    return result
+
+
+def format_data(data, indent):
+    if type(data) is dict:
+        indent += '    '
+        result = '{\n'
+        for key in data.keys():
+            value = format_data(data[key], indent)
+            result += indent + '  ' + key + ': ' + value + '\n'
+        result += indent[:-2] + '}'
+    elif data is False:
+        result = 'false'
+    elif data is True:
+        result = 'true'
+    elif data is None:
+        result = 'null'
+    else:
+        result = str(data)
+
+    return result
+
+
+def differ(dict1, dict2):
+    result = []
+    keys = sorted(dict1.keys() | dict2.keys())
+
+    for key in keys:
+        node = {'name': key}
+        if key not in dict1:
+            node['status'] = 'added'
+            node['data'] = dict2[key]
+        elif key not in dict2:
+            node['status'] = 'deleted'
+            node['data'] = dict1[key]
+        elif type(dict1[key]) is dict and type(dict2[key]) is dict:
+            node['status'] = 'nested'
+            node['children'] = differ(dict1[key], dict2[key])
+        elif dict1[key] == dict2[key]:
+            node['status'] = 'not changed'
+            node['data'] = dict1[key]
         else:
-            diff.append(('  ' + k, v))
+            node['status'] = 'changed'
+            node['data before'] = dict1[key]
+            node['data after'] = dict2[key]
+        result.append(node)
 
-    diff = json.dumps(dict(diff), indent=2, separators=('', ': '))
+    return result
 
-    return diff.replace('\"', '')
+
+def generate_diff(file_path1, file_path2):
+    dict1, dict2 = open_files(file_path1, file_path2)
+    diff = differ(dict1, dict2)
+    return stylish(diff)
