@@ -4,22 +4,22 @@ from gendiff.generate_diff import generate_diff
 
 
 @pytest.mark.parametrize(
-    "first_file, second_file, answer, format",
+    "file1,file2,answer,format",
     [
         ('file1.json', 'file2.json', 'answer_stylish.txt', 'stylish'),
         ('file1.yaml', 'file2.yaml', 'answer_stylish.txt', 'stylish'),
         ('file1.json', 'file2.json', 'answer_plain.txt', 'plain'),
         ('file1.yaml', 'file2.yaml', 'answer_plain.txt', 'plain'),
-        ('file1.json', 'file2.json', 'answer_json.txt', 'json'),
-        ('file1.yaml', 'file2.yaml', 'answer_json.txt', 'json'),
+        ('file1.json', 'file2.json', 'answer_json.json', 'json'),
+        ('file1.yaml', 'file2.yaml', 'answer_json.json', 'json')
     ]
 )
-def test(file1, file2, answer, format):
+def test_differ(file1, file2, answer, format):
     file1_path = get_path(file1)
     file2_path = get_path(file2)
     answer_path = get_path(answer)
     with open('{}'.format(answer_path)) as f:
-        answer = f.read()[:1]
+        answer = f.read()[:-1]
     assert generate_diff(file1_path, file2_path, format) == answer
     if format == 'stylish':
         assert generate_diff(file1_path, file2_path) == answer
