@@ -7,11 +7,11 @@ from gendiff.generate_diff import generate_diff
     "file1,file2,answer,format",
     [
         ('file1.json', 'file2.json', 'answer_stylish.txt', 'stylish'),
-        ('file1.yaml', 'file2.yaml', 'answer_stylish.txt', 'stylish'),
+        ('file1.yml', 'file2.yml', 'answer_stylish.txt', 'stylish'),
         ('file1.json', 'file2.json', 'answer_plain.txt', 'plain'),
-        ('file1.yaml', 'file2.yaml', 'answer_plain.txt', 'plain'),
+        ('file1.yml', 'file2.yml', 'answer_plain.txt', 'plain'),
         ('file1.json', 'file2.json', 'answer_json.json', 'json'),
-        ('file1.yaml', 'file2.yaml', 'answer_json.json', 'json')
+        ('file1.yml', 'file2.yml', 'answer_json.json', 'json')
     ]
 )
 def test_differ(file1, file2, answer, format):
