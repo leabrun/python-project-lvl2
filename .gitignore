@@ -1,3 +1,5 @@
 RULES
 dist
 __pycache__
+.xml
+.coverage
