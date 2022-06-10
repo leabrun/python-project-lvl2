@@ -10,5 +10,5 @@ lint:
 test:
 	poetry run pytest
 test-coverage:
-	poetry run coverage rin -m pytest
+	poetry run coverage run -m pytest
 	poetry run coverage xml
