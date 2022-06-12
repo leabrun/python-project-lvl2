@@ -1,9 +1,9 @@
-from gendiff.formatters.to_stylish import stylish
-from gendiff.formatters.to_plain import plain
-from gendiff.formatters.to_json import to_json
+from gendiff.formatters.stylish import stylish
+from gendiff.formatters.plain import plain
+from gendiff.formatters.json import to_json
 
 
-def formater(diff_list, format):
+def formating(diff_list, format):
     if format == 'stylish':
         return stylish(diff_list)
     elif format == 'plain':
