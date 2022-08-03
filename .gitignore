@@ -1,5 +1,6 @@
 RULES
 dist
 __pycache__
-.xml
+coverage.xml
 .coverage
+test-coverage-tool
