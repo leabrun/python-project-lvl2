@@ -1,19 +1,19 @@
-def plain(diff_list):
-    diff_list.sort(key=lambda x: x['name'])
-    result = get_diff_plain_list(diff_list)
+def plain(diff):
+    diff.sort(key=lambda x: x['name'])
+    result = build_plain(diff)
     return '\n'.join(result)
 
 
-def get_diff_plain_list(diff_list, path=''):
+def build_plain(diff, path=''):
     result = []
-    for node in diff_list:
+    for node in diff:
         if node['status'] == 'nested':
             path_to_change = path + node['name'] + '.'
-            difference = get_diff_plain_list(node['children'], path_to_change)
+            difference = build_plain(node['children'], path_to_change)
             result.extend(difference)
         if node['status'] == 'added':
             path_to_change = path + node['name']
-            change = create_change(node['data'])
+            change = to_string(node['data'])
             difference = (
                 f"Property '{path_to_change}' was added "
                 f"with value: {change}"
@@ -21,13 +21,13 @@ def get_diff_plain_list(diff_list, path=''):
             result.append(difference)
         if node['status'] == 'deleted':
             path_to_change = path + node['name']
-            change = create_change(node['data'])
+            change = to_string(node['data'])
             difference = "Property '{}' was removed".format(path_to_change)
             result.append(difference)
         if node['status'] == 'changed':
             path_to_change = path + node['name']
-            change_before = create_change(node['data before'])
-            change_after = create_change(node['data after'])
+            change_before = to_string(node['data before'])
+            change_after = to_string(node['data after'])
             difference = (
                 f"Property '{path_to_change}' was updated. "
                 f"From {change_before} to {change_after}"
@@ -36,7 +36,7 @@ def get_diff_plain_list(diff_list, path=''):
     return result
 
 
-def create_change(data):
+def to_string(data):
     if type(data) is dict or type(data) is list:
         result = '[complex value]'
     elif data is False:

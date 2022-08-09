@@ -1,4 +1,4 @@
-from gendiff.formatters.ident_format import formating
+from gendiff.formatters.formatting import formating
 from gendiff.differ import differ
 from gendiff.parsing.io import open_file
 
